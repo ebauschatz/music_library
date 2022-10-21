@@ -20,7 +20,7 @@ def songs_list(request):
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def song_detail(request, pk):
-    song = get_object_or_404(Song, pk = pk)
+    song = get_object_or_404(Song, pk=pk)
     if request.method == 'GET':
         serializer = SongSerializer(song)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -32,3 +32,12 @@ def song_detail(request, pk):
     elif request.method == 'DELETE':
         song.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['PATCH'])
+def like_song(request, pk):
+    song = get_object_or_404(Song, pk=pk)
+    new_likes = {'likes': song.likes + 1}
+    serializer = SongSerializer(song, data=new_likes, partial=True)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return Response(serializer.data, status=status.HTTP_200_OK)
